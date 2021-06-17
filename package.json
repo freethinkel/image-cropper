@@ -12,6 +12,8 @@
 		"@types/react": "^16.9.0",
 		"@types/react-dom": "^16.9.0",
 		"@types/react-redux": "^7.1.7",
+		"cors": "^2.8.5",
+		"express": "^4.17.1",
 		"install": "^0.13.0",
 		"jszip": "^3.6.0",
 		"node-sass": "^5.0.0",
@@ -23,10 +25,12 @@
 		"typescript": "~4.1.5"
 	},
 	"scripts": {
-		"start": "react-scripts start",
+		"dev": "react-scripts start",
 		"build": "react-scripts build",
 		"test": "react-scripts test",
-		"eject": "react-scripts eject"
+		"eject": "react-scripts eject",
+		"start": "node server/index.js",
+		"sever:dev": "node ./server/index.js"
 	},
 	"eslintConfig": {
 		"extends": "react-app"
