@@ -1,6 +1,11 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { RootState } from '../..';
-import { createMiddleware, readFileAsDataUrl } from '../../../helpers/helpers';
+import {
+	createMiddleware,
+	readFileAsDataUrl,
+	resizePhoto,
+} from '../../../helpers/helpers';
+import JSZip from 'jszip';
 
 export type ResizedPhoto = {
 	area: {
@@ -34,7 +39,7 @@ const photosSlice = createSlice({
 		setPhotoIndexAction(state, { payload }: { payload: number }) {
 			state.selectedPhotoIndex = payload;
 		},
-		downloadPhotos() {},
+		downloadPhotosAction(state) {},
 		setPhotoResizeAction(
 			state,
 			{ payload }: { payload: { y: number; x: number; zoom: number } }
@@ -55,7 +60,7 @@ export const {
 	removeFileAction,
 	setPhotoIndexAction,
 	setPhotoResizeAction,
-	downloadPhotos,
+	downloadPhotosAction,
 } = photosSlice.actions;
 
 export default photosSlice.reducer;
@@ -100,8 +105,28 @@ export const photosMiddleware = createMiddleware<RootState>({
 			);
 		}, 100);
 	},
-	[downloadPhotos.type]: ({ state, dispatch }, next, action) => {
-		// state.photos.resizedPhotos;
+	[downloadPhotosAction.type]: ({ state, dispatch }, next, action) => {
+		const zip = new JSZip();
+		var img = zip.folder('images')!;
+		Promise.all(
+			state.photos.resizedPhotos.map(async (_, i) => {
+				const file = state.photos.files[i];
+				const resize = state.photos.resizedPhotos[i];
+				const content = String(
+					await resizePhoto(file, resize, state.photos.aspect)
+				).split('base64,')[1];
+				img.file(file.name, content, { base64: true });
+			})
+		).then((_) => {
+			console.log(img);
+			zip.generateAsync({ type: 'base64' }).then(function (content) {
+				// see FileSaver.js
+				const link = document.createElement('a');
+				link.setAttribute('download', 'cropped.zip');
+				link.setAttribute('href', 'data:application/zip;base64,' + content);
+				link.click();
+			});
+		});
 	},
 });
 

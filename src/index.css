@@ -32,3 +32,16 @@ code {
 	padding-top: 24px;
 	padding-bottom: 40px;
 }
+
+:root {
+	--color-primary: #ff541a;
+	--color-accent: #fff08c;
+	--color-black: #454545;
+	--radius: 10px;
+}
+
+*,
+*::after,
+*::before {
+	box-sizing: border-box;
+}

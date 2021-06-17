@@ -1,21 +1,24 @@
-.grag_n_drop_wrapper {
+.dnd_wrapper {
 	position: relative;
 	display: flex;
 	z-index: 100;
 	height: 100%;
 	width: 100%;
 	flex-grow: 1;
+	&__active {
+		opacity: 1;
+		visibility: visible;
+		z-index: 100;
+	}
+	&__fixed {
+		position: fixed;
+		top: 0;
+		left: 0;
+		width: 100%;
+		height: 100%;
+	}
 }
-
-.grag_n_drop_wrapper__fixed {
-	position: fixed;
-	top: 0;
-	left: 0;
-	width: 100%;
-	height: 100%;
-}
-
-.drag_n_grop_inner {
+.dnd_inner {
 	position: absolute;
 	top: 0;
 	left: 0;
@@ -30,14 +33,13 @@
 	padding: 12px;
 	z-index: 100;
 	color: #fff;
-}
-
-.drag_n_grop_inner h3 {
-	color: #fff;
-}
-
-.drag_n_grop_inner__active {
-	opacity: 1;
-	visibility: visible;
-	z-index: 100;
+	gap: 12px;
+	&__active {
+		opacity: 1;
+		visibility: visible;
+		z-index: 100;
+	}
+	& h3 {
+		color: #fff;
+	}
 }

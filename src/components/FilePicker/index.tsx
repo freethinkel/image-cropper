@@ -1,9 +1,6 @@
 import React, { useState } from 'react';
-import { message, Space } from 'antd';
-import style from './style.module.css';
-import { Typography } from 'antd';
 import DragNDropIcon from '../../assets/images/drag_n_drop.svg';
-const { Title } = Typography;
+import style from './style.module.scss';
 
 type DragNDropProps = {
 	onFilePick: (files: File[]) => void;
@@ -17,45 +14,44 @@ const DragNDrop: React.FC<DragNDropProps> = ({
 }) => {
 	const [isDropMode, setDropMode] = useState(false);
 	return (
-		<div
-			className={[
-				style.grag_n_drop_wrapper,
-				isFixed && style.grag_n_drop_wrapper__fixed,
-				isDropMode && style.grag_n_drop_wrapper__active,
-			].join(' ')}
-			onDragLeave={() => setDropMode(false)}
-			onDragEnter={() => setDropMode(true)}
-			onDragOver={(event) => {
-				event.stopPropagation();
-				event.preventDefault();
-				setDropMode(true);
-			}}
-			onDrop={(event) => {
-				event.stopPropagation();
-				event.preventDefault();
-				const files = [...(event.dataTransfer.files || [])].filter(
-					(file) => file.type.split('/')[0] === 'image'
-				);
-				if (files.length) {
-					onFilePick(files);
-				}
-				setDropMode(false);
-			}}
-		>
-			<Space
-				direction='vertical'
-				align='center'
-				size='middle'
+		<>
+			<div
 				className={[
-					style.drag_n_grop_inner,
-					isDropMode && style.drag_n_grop_inner__active,
+					style.dnd_wrapper,
+					isFixed && style.dnd_wrapper__fixed,
+					isDropMode && style.dnd_wrapper__active,
 				].join(' ')}
+				onDragLeave={() => setDropMode(false)}
+				onDragEnter={() => setDropMode(true)}
+				onDragOver={(event) => {
+					event.stopPropagation();
+					event.preventDefault();
+					setDropMode(true);
+				}}
+				onDrop={(event) => {
+					event.stopPropagation();
+					event.preventDefault();
+					const files = [...(event.dataTransfer.files || [])].filter(
+						(file) => file.type.split('/')[0] === 'image'
+					);
+					if (files.length) {
+						onFilePick(files);
+					}
+					setDropMode(false);
+				}}
 			>
-				<img src={DragNDropIcon} alt='drag and drop icon' />
-				<Title level={3}>Перетащите файлы сюда</Title>
-			</Space>
-			{children}
-		</div>
+				<div
+					className={[
+						style.dnd_inner,
+						isDropMode && style.dnd_inner__active,
+					].join(' ')}
+				>
+					<img src={DragNDropIcon} alt='drag and drop icon' />
+					<h3>Перетащите файлы сюда</h3>
+				</div>
+				{children}
+			</div>
+		</>
 	);
 };
 

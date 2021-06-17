@@ -1,4 +1,4 @@
-import style from './style.module.css';
+import style from './style.module.scss';
 
 type ButtonProps = {
 	onClick: () => void;
@@ -11,9 +11,11 @@ const Button: React.FC<ButtonProps> = ({
 	children,
 }) => {
 	return (
-		<button className={style.button} type={type} onClick={onClick}>
-			{children}
-		</button>
+		<>
+			<button className={style.btn} type={type} onClick={onClick}>
+				{children}
+			</button>
+		</>
 	);
 };
 
