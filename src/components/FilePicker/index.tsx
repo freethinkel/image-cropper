@@ -33,7 +33,9 @@ const DragNDrop: React.FC<DragNDropProps> = ({
 			onDrop={(event) => {
 				event.stopPropagation();
 				event.preventDefault();
-				const files = [...(event.dataTransfer.files || [])];
+				const files = [...(event.dataTransfer.files || [])].filter(
+					(file) => file.type.split('/')[0] === 'image'
+				);
 				if (files.length) {
 					onFilePick(files);
 				}

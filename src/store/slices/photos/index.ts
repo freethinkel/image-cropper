@@ -4,11 +4,10 @@ import { createMiddleware, readFileAsDataUrl } from '../../../helpers/helpers';
 
 export type ResizedPhoto = {
 	area: {
-		width: number;
-		height: number;
 		x: number;
 		y: number;
 	};
+	zoom: number;
 	image: any;
 };
 
@@ -38,18 +37,13 @@ const photosSlice = createSlice({
 		downloadPhotos() {},
 		setPhotoResizeAction(
 			state,
-			{
-				payload,
-			}: { payload: { y?: number; x?: number; width?: number; height: number } }
+			{ payload }: { payload: { y: number; x: number; zoom: number } }
 		) {
 			const index = state.selectedPhotoIndex;
 			if (state.resizedPhotos[index]) {
-				payload.y && (state.resizedPhotos[index].area.y = payload.y);
-				payload.x && (state.resizedPhotos[index].area.x = payload.x);
-				payload.width &&
-					(state.resizedPhotos[index].area.width = payload.width);
-				payload.height &&
-					(state.resizedPhotos[index].area.height = payload.height);
+				state.resizedPhotos[index].area.y = payload.y;
+				state.resizedPhotos[index].area.x = payload.x;
+				state.resizedPhotos[index].zoom = payload.zoom;
 			}
 		},
 	},
@@ -74,18 +68,34 @@ export const photosMiddleware = createMiddleware<RootState>({
 			return image;
 		});
 		// timeout for hack get size
-		setTimeout(() => {
+		setTimeout(async () => {
 			dispatch(
 				setResizedPhotosAction(
-					images.map((image) => ({
-						image: image,
-						area: {
-							width: image.naturalWidth / 100,
-							height: image.naturalHeight / 100,
-							y: image.naturalWidth / 100 / 2,
-							x: image.naturalHeight / 100 / 2,
-						},
-					}))
+					images.map((image) => {
+						const aspect = state.photos.aspect;
+						const originalAspect = image.naturalWidth / image.naturalHeight;
+						let width = 0;
+						let height = 0;
+						if (originalAspect < aspect) {
+							width = image.naturalWidth * 1;
+							height = image.naturalWidth * (1 / aspect);
+						} else {
+							width = image.naturalHeight * aspect;
+							height = image.naturalHeight * 1;
+						}
+						console.log(width, height, [
+							image.naturalWidth,
+							image.naturalHeight,
+						]);
+						return {
+							image: image,
+							zoom: 1,
+							area: {
+								y: 50 - (height / image.naturalHeight) * (100 / 2),
+								x: 50 - (width / image.naturalWidth) * (100 / 2),
+							},
+						};
+					})
 				)
 			);
 		}, 100);
@@ -98,4 +108,19 @@ export const photosMiddleware = createMiddleware<RootState>({
 export const resizeFile = async (file: File) => {
 	const base64 = await readFileAsDataUrl(file);
 	return base64;
+};
+
+const computeAreaSize = (height: number, width: number, aspect: number) => {
+	let _width = width;
+	let _height = height;
+	if (width / height > aspect) {
+		_width = height * aspect;
+	} else if (width / height < aspect) {
+		// "wide" or square crop
+		_height = width / aspect;
+	}
+	return {
+		width: _width,
+		height: _height,
+	};
 };

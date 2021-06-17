@@ -68,11 +68,18 @@ export const resizePhoto = async (
 	// const binary = await readFileAsDataUrl(file);
 	var canvas = document.createElement('canvas');
 	const image = resize.image;
+	const originalAspect = image.naturalWidth / image.naturalHeight;
 
-	canvas.width = (resize.area.width / 100) * image.naturalWidth;
-	canvas.height = (resize.area.height / 100) * image.naturalHeight;
+	if (originalAspect < aspect) {
+		canvas.width = image.naturalWidth * 1;
+		canvas.height = image.naturalWidth * (1 / aspect);
+	} else {
+		canvas.width = image.naturalHeight * aspect;
+		canvas.height = image.naturalHeight * 1;
+	}
+
 	const ctx = canvas.getContext('2d')!;
-	// ctx.scale(resize.zoom, resize.zoom);
+	ctx.scale(resize.zoom, resize.zoom);
 	ctx.drawImage(
 		image,
 		-(resize.area.x / 100) * image.naturalWidth,

@@ -31,15 +31,14 @@ const Resizer = () => {
 	// }, [resizedPhoto]);
 
 	const onCropComplete = (croppedArea: any, croppedAreaPixels: any) => {
-		console.log(croppedArea, croppedAreaPixels);
-		dispatch(
-			setPhotoResizeAction({
-				y: croppedArea.y,
-				x: croppedArea.x,
-				width: croppedArea.width,
-				height: croppedArea.height,
-			})
-		);
+		console.log(croppedArea);
+		// dispatch(
+		// 	setPhotoResizeAction({
+		// 		y: croppedArea.y,
+		// 		x: croppedArea.x,
+		// 		zoom: zoom,
+		// 	})
+		// );
 	};
 
 	return (
