@@ -27,13 +27,17 @@
 	visibility: hidden;
 	opacity: 0;
 	transition: 0.1s;
-	background: rgba(0, 0, 0, 0.18);
+	background: rgba(0, 0, 0, 0.32);
 	align-items: center;
 	justify-content: center;
 	padding: 12px;
 	z-index: 100;
 	color: #fff;
 	gap: 12px;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
 	&__active {
 		opacity: 1;
 		visibility: visible;

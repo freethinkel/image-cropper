@@ -2,7 +2,7 @@
 	height: 80px;
 	width: 80px;
 	border-radius: 10px;
-	border: 2px solid #1890ff;
+	border: 1px solid var(--color-accent);
 	outline: none;
 	cursor: pointer;
 	padding: 0;
@@ -14,4 +14,8 @@
 	width: 100%;
 	object-fit: cover;
 	border-radius: 8px;
+}
+
+.active {
+	border: 1px solid var(--color-primary);
 }

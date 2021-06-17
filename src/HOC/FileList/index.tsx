@@ -8,6 +8,9 @@ import style from './style.module.scss';
 const FileList = () => {
 	const dispatch = useDispatch();
 	const photos = useSelector((state: RootState) => state.photos.files);
+	const currentIndex = useSelector(
+		(state: RootState) => state.photos.selectedPhotoIndex
+	);
 	const selectPhoto = (index: number) => dispatch(setPhotoIndexAction(index));
 
 	return (
@@ -16,7 +19,11 @@ const FileList = () => {
 				<div className={style.container}>
 					{photos.map((file, index) => (
 						<React.Fragment key={file.size}>
-							<FilePreview file={file} onSelect={() => selectPhoto(index)} />
+							<FilePreview
+								active={index === currentIndex}
+								file={file}
+								onSelect={() => selectPhoto(index)}
+							/>
 						</React.Fragment>
 					))}
 				</div>

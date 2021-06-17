@@ -13,7 +13,7 @@ const Welcome = () => {
 	return (
 		<div className='container page'>
 			<h1>Загрузите изображения</h1>
-			asd asd asdas dasdas das das d sd asd asd
+			<p>Суда перетащи фотки просто</p>
 		</div>
 	);
 };

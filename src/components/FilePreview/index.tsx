@@ -4,9 +4,14 @@ import style from './style.module.css';
 type FilePreviewProps = {
 	file: File;
 	onSelect: () => void;
+	active?: boolean;
 };
 
-const FilePreview: React.FC<FilePreviewProps> = ({ file, onSelect }) => {
+const FilePreview: React.FC<FilePreviewProps> = ({
+	file,
+	onSelect,
+	active,
+}) => {
 	const [preview, setPreview] = useState('');
 	useEffect(() => {
 		const reader = new FileReader();
@@ -17,7 +22,11 @@ const FilePreview: React.FC<FilePreviewProps> = ({ file, onSelect }) => {
 	}, [file]);
 
 	return (
-		<button className={style.wrapper} type='button' onClick={onSelect}>
+		<button
+			className={[style.wrapper, active && style.active].join(' ')}
+			type='button'
+			onClick={onSelect}
+		>
 			<img src={preview} alt={file.name} />
 		</button>
 	);
