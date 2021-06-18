@@ -8,6 +8,7 @@ import { RootState } from '../store';
 import ResizerPreview from './ResizerPreview';
 import DownloadButton from './DownloadButton';
 import SelectAspect from './SelectAspect';
+import ToggleAspect from './ToggleAspect';
 
 const Welcome = () => {
 	return (
@@ -30,7 +31,7 @@ const ResizeLayout: React.FC = () => {
 			{!hasFiles && <Welcome />}
 			{hasFiles && <FileList />}
 			{hasFiles && <DownloadButton />}
-			{hasFiles && <SelectAspect />}
+			{hasFiles && <ToggleAspect />}
 		</FilePicker>
 	);
 };
