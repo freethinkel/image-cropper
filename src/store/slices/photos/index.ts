@@ -1,11 +1,8 @@
-import { createSlice } from '@reduxjs/toolkit';
+import { AnyAction, createSlice } from '@reduxjs/toolkit';
 import { RootState } from '../..';
-import {
-	createMiddleware,
-	readFileAsDataUrl,
-	resizePhoto,
-} from '../../../helpers/helpers';
+import { createMiddleware, resizePhoto } from '../../../helpers/helpers';
 import JSZip from 'jszip';
+import { Dispatch } from 'react';
 
 export type ResizedPhoto = {
 	area: {
@@ -40,6 +37,9 @@ const photosSlice = createSlice({
 			state.selectedPhotoIndex = payload;
 		},
 		downloadPhotosAction(state) {},
+		setAspectAction(state, { payload }: { payload: number }) {
+			state.aspect = payload;
+		},
 		setPhotoResizeAction(
 			state,
 			{ payload }: { payload: { y: number; x: number; zoom: number } }
@@ -61,49 +61,27 @@ export const {
 	setPhotoIndexAction,
 	setPhotoResizeAction,
 	downloadPhotosAction,
+	setAspectAction,
 } = photosSlice.actions;
 
 export default photosSlice.reducer;
 
 export const photosMiddleware = createMiddleware<RootState>({
 	[addFilesAction.type]: ({ state, dispatch }, next, action) => {
-		const images = [...state.photos.files, ...action.payload].map((file) => {
-			const image = new Image();
-			image.src = URL.createObjectURL(file);
-			return image;
+		updatePhotoSizes({
+			dispatch,
+			state,
+			aspect: state.photos.aspect,
+			files: [...state.photos.files, ...(action.payload as File[])],
 		});
-		// timeout for hack get size
-		setTimeout(async () => {
-			dispatch(
-				setResizedPhotosAction(
-					images.map((image) => {
-						const aspect = state.photos.aspect;
-						const originalAspect = image.naturalWidth / image.naturalHeight;
-						let width = 0;
-						let height = 0;
-						if (originalAspect < aspect) {
-							width = image.naturalWidth * 1;
-							height = image.naturalWidth * (1 / aspect);
-						} else {
-							width = image.naturalHeight * aspect;
-							height = image.naturalHeight * 1;
-						}
-						console.log(width, height, [
-							image.naturalWidth,
-							image.naturalHeight,
-						]);
-						return {
-							image: image,
-							zoom: 1,
-							area: {
-								y: 50 - (height / image.naturalHeight) * (100 / 2),
-								x: 50 - (width / image.naturalWidth) * (100 / 2),
-							},
-						};
-					})
-				)
-			);
-		}, 100);
+	},
+	[setAspectAction.type]: ({ state, dispatch }, next, action) => {
+		updatePhotoSizes({
+			dispatch,
+			state,
+			aspect: action.payload || state.photos.aspect,
+			files: [...state.photos.files],
+		});
 	},
 	[downloadPhotosAction.type]: ({ state, dispatch }, next, action) => {
 		const zip = new JSZip();
@@ -130,22 +108,47 @@ export const photosMiddleware = createMiddleware<RootState>({
 	},
 });
 
-export const resizeFile = async (file: File) => {
-	const base64 = await readFileAsDataUrl(file);
-	return base64;
-};
-
-const computeAreaSize = (height: number, width: number, aspect: number) => {
-	let _width = width;
-	let _height = height;
-	if (width / height > aspect) {
-		_width = height * aspect;
-	} else if (width / height < aspect) {
-		// "wide" or square crop
-		_height = width / aspect;
-	}
-	return {
-		width: _width,
-		height: _height,
-	};
+const updatePhotoSizes = ({
+	dispatch,
+	state,
+	files,
+	aspect,
+}: {
+	dispatch: Dispatch<AnyAction>;
+	state: RootState;
+	files: File[];
+	aspect: number;
+}) => {
+	const images = [...files].map((file) => {
+		const image = new Image();
+		image.src = URL.createObjectURL(file);
+		return image;
+	});
+	setTimeout(async () => {
+		dispatch(
+			setResizedPhotosAction(
+				images.map((image) => {
+					const originalAspect = image.naturalWidth / image.naturalHeight;
+					let width = 0;
+					let height = 0;
+					if (originalAspect < aspect) {
+						width = image.naturalWidth * 1;
+						height = image.naturalWidth * (1 / aspect);
+					} else {
+						width = image.naturalHeight * aspect;
+						height = image.naturalHeight * 1;
+					}
+					console.log(width, height, [image.naturalWidth, image.naturalHeight]);
+					return {
+						image: image,
+						zoom: 1,
+						area: {
+							y: 50 - (height / image.naturalHeight) * (100 / 2),
+							x: 50 - (width / image.naturalWidth) * (100 / 2),
+						},
+					};
+				})
+			)
+		);
+	}, 100);
 };

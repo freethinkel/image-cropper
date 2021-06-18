@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import style from './style.module.css';
 
 type FilePreviewProps = {
 	file: File;
@@ -23,11 +22,18 @@ const FilePreview: React.FC<FilePreviewProps> = ({
 
 	return (
 		<button
-			className={[style.wrapper, active && style.active].join(' ')}
+			className={[
+				'w-12 h-12 rounded-md outline-none appearance-none focus:outline-none',
+				active && 'border border-red-400',
+			].join(' ')}
 			type='button'
 			onClick={onSelect}
 		>
-			<img src={preview} alt={file.name} />
+			<img
+				className='w-full h-full object-cover rounded-md'
+				src={preview}
+				alt={file.name}
+			/>
 		</button>
 	);
 };

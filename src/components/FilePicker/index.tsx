@@ -47,7 +47,7 @@ const DragNDrop: React.FC<DragNDropProps> = ({
 					].join(' ')}
 				>
 					<img src={DragNDropIcon} alt='drag and drop icon' />
-					<h3>Перетащите файлы сюда</h3>
+					<h3 className='text-xl text-white'>Перетащите файлы сюда</h3>
 				</div>
 				{children}
 			</div>

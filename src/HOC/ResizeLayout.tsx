@@ -6,13 +6,13 @@ import FileList from './FileList';
 import Resizer from './Resizer';
 import { RootState } from '../store';
 import ResizerPreview from './ResizerPreview';
-import Button from '../components/Button';
 import DownloadButton from './DownloadButton';
+import SelectAspect from './SelectAspect';
 
 const Welcome = () => {
 	return (
-		<div className='container page'>
-			<h1>Загрузите изображения</h1>
+		<div className='container page mx-auto'>
+			<h1 className='text-4xl font-black mb-4'>Загрузите изображения</h1>
 			<p>Суда перетащи фотки просто</p>
 		</div>
 	);
@@ -30,6 +30,7 @@ const ResizeLayout: React.FC = () => {
 			{!hasFiles && <Welcome />}
 			{hasFiles && <FileList />}
 			{hasFiles && <DownloadButton />}
+			{hasFiles && <SelectAspect />}
 		</FilePicker>
 	);
 };

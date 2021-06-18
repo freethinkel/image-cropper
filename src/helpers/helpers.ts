@@ -63,27 +63,32 @@ export const nanoDelay = (ms: number) =>
 export const resizePhoto = async (
 	file: File,
 	resize: ResizedPhoto,
-	aspect: number
+	aspect: number,
+	quality = 1
 ) => {
 	// const binary = await readFileAsDataUrl(file);
 	var canvas = document.createElement('canvas');
 	const image = resize.image;
-	const originalAspect = image.naturalWidth / image.naturalHeight;
+	const width = image.naturalWidth * quality;
+	const height = image.naturalHeight * quality;
+	const originalAspect = width / height;
 
 	if (originalAspect < aspect) {
-		canvas.width = image.naturalWidth * 1;
-		canvas.height = image.naturalWidth * (1 / aspect);
+		canvas.width = width * 1;
+		canvas.height = width * (1 / aspect);
 	} else {
-		canvas.width = image.naturalHeight * aspect;
-		canvas.height = image.naturalHeight * 1;
+		canvas.width = height * aspect;
+		canvas.height = height * 1;
 	}
 
 	const ctx = canvas.getContext('2d')!;
 	ctx.scale(resize.zoom, resize.zoom);
 	ctx.drawImage(
 		image,
-		-(resize.area.x / 100) * image.naturalWidth,
-		-(resize.area.y / 100) * image.naturalHeight
+		-(resize.area.x / 100) * width,
+		-(resize.area.y / 100) * height,
+		width,
+		height
 	);
 
 	return canvas.toDataURL(file.type, 90);

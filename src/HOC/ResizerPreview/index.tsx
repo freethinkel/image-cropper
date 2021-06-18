@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useSelector } from 'react-redux';
-import { resizePhoto, usePreview } from '../../helpers/helpers';
+import { resizePhoto } from '../../helpers/helpers';
 import { RootState } from '../../store';
 import style from './style.module.css';
 
@@ -16,12 +16,11 @@ const ResizerPreview = () => {
 	const [resizedPreview, setResizedPreview] = useState('');
 	useEffect(() => {
 		if (file && resized) {
-			resizePhoto(file, resized, aspect).then((data) => {
+			resizePhoto(file, resized, aspect, 0.1).then((data) => {
 				setResizedPreview(data);
 			});
 		}
-	}, [file, resized]);
-	const preview = usePreview(file);
+	}, [file, resized, aspect]);
 	if (!resized) {
 		return null;
 	}
