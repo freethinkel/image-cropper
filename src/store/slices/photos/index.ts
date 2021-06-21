@@ -4,18 +4,20 @@ import { createMiddleware, resizePhoto } from '../../../helpers/helpers';
 import JSZip from 'jszip';
 import { Dispatch } from 'react';
 
+export const DEFAULT_ASPECT = 10 / 15;
+
 export type ResizedPhoto = {
 	area: {
 		x: number;
 		y: number;
 	};
+	aspect: number;
 	zoom: number;
 	image: any;
 };
 
 const DEFAULT = {
 	files: [] as File[],
-	aspect: 10 / 15,
 	resizedPhotos: [] as ResizedPhoto[],
 	selectedPhotoIndex: 0,
 };
@@ -37,8 +39,12 @@ const photosSlice = createSlice({
 			state.selectedPhotoIndex = payload;
 		},
 		downloadPhotosAction(state) {},
-		setAspectAction(state, { payload }: { payload: number }) {
-			state.aspect = payload;
+		setAspectAction(
+			state,
+			{ payload }: { payload: { aspect: number; index: number } }
+		) {
+			const { aspect, index } = payload;
+			state.resizedPhotos[index].aspect = aspect;
 		},
 		setPhotoResizeAction(
 			state,
@@ -71,15 +77,24 @@ export const photosMiddleware = createMiddleware<RootState>({
 		updatePhotoSizes({
 			dispatch,
 			state,
-			aspect: state.photos.aspect,
 			files: [...state.photos.files, ...(action.payload as File[])],
 		});
 	},
 	[setAspectAction.type]: ({ state, dispatch }, next, action) => {
+		let _state = {
+			...state,
+			photos: {
+				...state.photos,
+				resizedPhotos: state.photos.resizedPhotos.map((rs, i) =>
+					action.payload.index === i
+						? { ...rs, aspect: action.payload.aspect }
+						: rs
+				),
+			},
+		};
 		updatePhotoSizes({
 			dispatch,
-			state,
-			aspect: action.payload || state.photos.aspect,
+			state: _state,
 			files: [...state.photos.files],
 		});
 	},
@@ -91,7 +106,7 @@ export const photosMiddleware = createMiddleware<RootState>({
 				const file = state.photos.files[i];
 				const resize = state.photos.resizedPhotos[i];
 				const content = String(
-					await resizePhoto(file, resize, state.photos.aspect)
+					await resizePhoto(file, resize, resize.aspect)
 				).split('base64,')[1];
 				img.file(file.name, content, { base64: true });
 			})
@@ -112,12 +127,10 @@ const updatePhotoSizes = ({
 	dispatch,
 	state,
 	files,
-	aspect,
 }: {
 	dispatch: Dispatch<AnyAction>;
 	state: RootState;
 	files: File[];
-	aspect: number;
 }) => {
 	const images = [...files].map((file) => {
 		const image = new Image();
@@ -127,8 +140,10 @@ const updatePhotoSizes = ({
 	setTimeout(async () => {
 		dispatch(
 			setResizedPhotosAction(
-				images.map((image) => {
+				images.map((image, i) => {
 					const originalAspect = image.naturalWidth / image.naturalHeight;
+					const aspect =
+						state.photos.resizedPhotos[i]?.aspect || DEFAULT_ASPECT;
 					let width = 0;
 					let height = 0;
 					if (originalAspect < aspect) {
@@ -140,8 +155,9 @@ const updatePhotoSizes = ({
 					}
 					console.log(width, height, [image.naturalWidth, image.naturalHeight]);
 					return {
-						image: image,
+						image,
 						zoom: 1,
+						aspect,
 						area: {
 							y: 50 - (height / image.naturalHeight) * (100 / 2),
 							x: 50 - (width / image.naturalWidth) * (100 / 2),
@@ -150,5 +166,5 @@ const updatePhotoSizes = ({
 				})
 			)
 		);
-	}, 100);
+	}, 200);
 };

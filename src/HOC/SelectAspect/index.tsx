@@ -37,7 +37,13 @@ const ITEMS = [
 
 const SelectAspect = () => {
 	const dispatch = useDispatch();
-	const currentAspect = useSelector((state: RootState) => state.photos.aspect);
+	const currentIndex = useSelector(
+		(state: RootState) => state.photos.selectedPhotoIndex
+	);
+	const resizedPhotos = useSelector(
+		(state: RootState) => state.photos.resizedPhotos
+	);
+	const currentAspect = resizedPhotos[currentIndex].aspect;
 	return (
 		<div className={style.wrapper}>
 			<Select

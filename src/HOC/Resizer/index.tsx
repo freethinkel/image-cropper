@@ -3,7 +3,10 @@ import Cropper from 'react-easy-crop';
 import { useDispatch, useSelector } from 'react-redux';
 import { usePreview } from '../../helpers/helpers';
 import { RootState } from '../../store';
-import { setPhotoResizeAction } from '../../store/slices/photos';
+import {
+	DEFAULT_ASPECT,
+	setPhotoResizeAction,
+} from '../../store/slices/photos';
 import style from './style.module.scss';
 
 const Resizer = () => {
@@ -14,7 +17,10 @@ const Resizer = () => {
 	const file = useSelector(
 		(state: RootState) => state.photos.files[photoIndex]
 	);
-	const aspect = useSelector((state: RootState) => state.photos.aspect);
+	const resizedPhotos = useSelector(
+		(state: RootState) => state.photos.resizedPhotos
+	);
+	const aspect = resizedPhotos[photoIndex]?.aspect || DEFAULT_ASPECT;
 
 	const [crop, setCrop] = useState({
 		x: 0,
